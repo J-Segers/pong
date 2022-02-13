@@ -12,7 +12,9 @@ function App() {
 
     const ctx = canvas.getContext('2d');
 
-    initiatePong(canvas, ctx);
+    let numberOfPlayers = 1;
+
+    initiatePong(canvas, ctx, numberOfPlayers);
   });
   return (
     <div className="App">
@@ -65,22 +67,82 @@ function Ball(canvas, ctx) {
 
 }
 
-function initiatePong(canvas, ctx) {
+function initiatePong(canvas, ctx, players) {
+
+  console.log(players)
 
   let ballArray = [];
+  let paddleArray = [];
 
   ballArray.push(new Ball(canvas, ctx))
 
-  animate(canvas, ctx, ballArray);
+  for (let i = 0; i < 2; i++) {
+    let player;
+    switch(players) {
+      case 1:
+        player = "p1";
+        break;
+      case 2:
+        player = "p2";
+        break;
+      default:
+        player = "ai";
+        break;
+    }
+    paddleArray.push(new Paddle(canvas, ctx, player))
+
+    players--;
+  }
+  console.log(paddleArray)
+  animate(canvas, ctx, ballArray, paddleArray);
 
 }
 
-function animate(canvas, ctx, ballArray) {
-  requestAnimationFrame(function() {animate(canvas, ctx, ballArray);})
+function animate(canvas, ctx, ballArray, paddleArray) {
+  requestAnimationFrame(function() {animate(canvas, ctx, ballArray, paddleArray);})
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for(let i = 0; i < ballArray.length; i++) {
     ballArray[i].update();
+  }
+  for (let i = 0; i < paddleArray.length; i++) {
+    paddleArray[i].draw();
+  }
+}
+
+function Paddle(canvas, ctx, player) {
+  this.canvas = canvas;
+  this.ctx = ctx;
+  this.player = player;
+  this.size = {width: 25, height: 300};
+  this.position = {x: setPosition(this.canvas, this.player, 40), y: canvas.height / 2};
+  this.color = {r: 255, g: 255, b: 255};
+
+  this.draw =function() {
+    this.ctx.beginPath();
+    this.ctx.fillRect(this.position.x - this.size.width / 2, this.position.y - this.size.height / 2, this.size.width, this.size.height);
+    this.ctx.fillStyle = `rgb(${this.color.r},${this.color.g}, ${this.color.b})`;
+    this.ctx.fill();
+  }
+
+  this.update = function() {
+
+    this.draw();
+  }
+
+}
+
+function setPosition(canvas, player) {
+
+  const position = 50;
+
+  switch(player) {
+    case "p1":
+      return position;
+    case "p2":
+      return canvas.width - position;
+    default:
+      return canvas.width - position;
   }
 }

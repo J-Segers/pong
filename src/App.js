@@ -12,7 +12,7 @@ function App() {
 
     const ctx = canvas.getContext('2d');
 
-    let numberOfPlayers = 1;
+    let numberOfPlayers = 0;
 
     initiatePong(canvas, ctx, numberOfPlayers);
   });
@@ -32,8 +32,9 @@ function setCanvasSize(canvas) {
   canvas.height = window.innerHeight * 2;
 }
 
+//ball component and corresponding function from here
 function Ball(canvas, ctx) {
-  let startingVelocity = {dx: 5, dy: 5};
+  let startingVelocity = setBallVelocity();
   let startingPosition = {x: canvas.width / 2, y: canvas.height / 2};
 
   this.canvas = canvas;
@@ -55,7 +56,7 @@ function Ball(canvas, ctx) {
       this.velocity.dx *= -1;
     }
 
-    if( this.position.y + this.radius > this.canvas.height || this.position.y - this.radius < 0) {
+    if(this.position.y + this.radius > this.canvas.height || this.position.y - this.radius < 0) {
       this.velocity.dy *= -1;
     }
 
@@ -65,33 +66,108 @@ function Ball(canvas, ctx) {
     this.draw();
   }
 
+  function setBallVelocity() {
+
+    const velocity = {dx: 5, dy: undefined};
+
+    velocity.dx *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+
+    velocity.dy = Math.ceil(Math.random() * 100 / 10) % 5;
+    velocity.dy *= Math.floor(Math.random() * 2) === 1 ? 1 : -1;
+
+    return velocity;
+  }
+
 }
+//----------------------------------------------------------------------------------------------------------------------
+
+//paddle component and corresponding function from here
+function Paddle(canvas, ctx, player) {
+  this.canvas = canvas;
+  this.ctx = ctx;
+  this.player = player;
+  this.size = {width: 25, height: 300};
+  this.position = setPosition(this.canvas, this.player, 40);
+  this.color = {r: 255, g: 255, b: 255};
+
+  this.draw = function() {
+    this.ctx.beginPath();
+    this.ctx.fillRect(this.position.x - this.size.width / 2, this.position.y - this.size.height / 2, this.size.width, this.size.height);
+    this.ctx.fillStyle = `rgb(${this.color.r},${this.color.g}, ${this.color.b})`;
+    this.ctx.fill();
+  }
+
+  this.update = function() {
+
+    this.draw();
+  }
+
+}
+
+function setPosition(canvas, player) {
+  const xPos = 50
+
+  const position = {x: undefined, y: canvas.height / 2};
+
+  switch(player) {
+    case "p1":
+      position.x = xPos;
+      break;
+    case "p2":
+      position.x = canvas.width - xPos;
+      break;
+    case "ai":
+      position.x = canvas.width - xPos;
+      break;
+    case "ai2":
+      position.x = xPos;
+      break;
+    default:
+      position.x = canvas.width - xPos;
+      break;
+  }
+
+  return position;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
 
 function initiatePong(canvas, ctx, players) {
 
   console.log(players)
 
   let ballArray = [];
+  ballArray.push(new Ball(canvas, ctx));
+
   let paddleArray = [];
-
-  ballArray.push(new Ball(canvas, ctx))
-
+  let player;
+  let aiExists = false;
   for (let i = 0; i < 2; i++) {
-    let player;
+
     switch(players) {
+      case 0:
+        if(aiExists){
+          player = "ai2"
+        } else {
+          player = "ai";
+          aiExists = true;
+        }
+        break;
       case 1:
         player = "p1";
+        players--;
         break;
       case 2:
         player = "p2";
+        players--;
         break;
       default:
         player = "ai";
         break;
     }
+
     paddleArray.push(new Paddle(canvas, ctx, player))
 
-    players--;
   }
   console.log(paddleArray)
   animate(canvas, ctx, ballArray, paddleArray);
@@ -108,41 +184,5 @@ function animate(canvas, ctx, ballArray, paddleArray) {
   }
   for (let i = 0; i < paddleArray.length; i++) {
     paddleArray[i].draw();
-  }
-}
-
-function Paddle(canvas, ctx, player) {
-  this.canvas = canvas;
-  this.ctx = ctx;
-  this.player = player;
-  this.size = {width: 25, height: 300};
-  this.position = {x: setPosition(this.canvas, this.player, 40), y: canvas.height / 2};
-  this.color = {r: 255, g: 255, b: 255};
-
-  this.draw =function() {
-    this.ctx.beginPath();
-    this.ctx.fillRect(this.position.x - this.size.width / 2, this.position.y - this.size.height / 2, this.size.width, this.size.height);
-    this.ctx.fillStyle = `rgb(${this.color.r},${this.color.g}, ${this.color.b})`;
-    this.ctx.fill();
-  }
-
-  this.update = function() {
-
-    this.draw();
-  }
-
-}
-
-function setPosition(canvas, player) {
-
-  const position = 50;
-
-  switch(player) {
-    case "p1":
-      return position;
-    case "p2":
-      return canvas.width - position;
-    default:
-      return canvas.width - position;
   }
 }

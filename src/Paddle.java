@@ -24,12 +24,16 @@ public class Paddle {
     public void moveTo(int yDestination) {
         int centerY = y + height / 2;
 
-        if (centerY > yDestination) {
-            y -= speed;
-        }
+        if(Math.abs(centerY - yDestination) > speed){
+            if (centerY > yDestination) {
+                y -= speed;
+            }
 
-        if (centerY < yDestination) {
-            y += speed;
+            if (centerY < yDestination) {
+                y += speed;
+            }
         }
     }
+
+
 }

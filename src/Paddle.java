@@ -35,5 +35,15 @@ public class Paddle {
         }
     }
 
+    public boolean checkBallCollision(Ball ball) {
+        int rightX = x + PADDLE_WIDTH;
+        int bottomY = y + height;
 
+        if (ball.getX() > x - ball.getSize() && ball.getX() < rightX) {
+            if (ball.getY() > y  && ball.getY() < bottomY){
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -19,6 +19,18 @@ public class Ball {
         this.color = color;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
     public void paint(Graphics graphics) {
         graphics.setColor(color);
         graphics.fillOval(x, y, size, size);
@@ -40,15 +52,12 @@ public class Ball {
 
     }
 
-    private void reverseY() {
+    public void reverseY() {
         cy *= -1;
     }
 
-    private void reverseX() {
+    public void reverseX() {
         cx *= -1;
     }
 
-    public int getY() {
-        return y;
-    }
 }
